@@ -1,0 +1,10 @@
+---
+install_cadvisor_exporter: true
+users:
+  - username: kevin
+    oh_my_zsh:
+      theme: robbyrussell
+  - username: root
+    oh_my_zsh:
+      theme: robbyrussell
+

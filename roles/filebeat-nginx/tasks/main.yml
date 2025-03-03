@@ -1,0 +1,57 @@
+- name: Update APT package cache
+  apt:
+    update_cache: yes
+
+- name: Install dependencies
+  apt:
+    name: [apt-transport-https, wget]
+    state: present
+
+- name: Download and add Elastic GPG key
+  ansible.builtin.shell: |
+    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+  args:
+    executable: /bin/bash
+
+- name: Add Elastic APT repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/elastic-8.x.list
+    content: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+
+- name: Update APT cache after adding repo
+  apt:
+    update_cache: yes
+
+- name: Install Filebeat
+  apt:
+    name: filebeat
+    state: present
+
+- name: Copy Filebeat configuration
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat-nginx.yml
+
+- name: Disable default Filebeat service
+  systemd:
+    name: filebeat
+    enabled: no
+    state: stopped
+
+- name: Remove default Filebeat systemd service file
+  file:
+    path: /etc/systemd/system/filebeat.service
+    state: absent
+
+- name: Copy nginx Filebeat systemd service file
+  template:
+    src: filebeat-nginx.service.j2
+    dest: /etc/systemd/system/filebeat-nginx.service
+    mode: '0644'
+
+- name: Enable and restart Filebeat service
+  systemd:
+    name: filebeat-nginx
+    enabled: yes
+    state: restarted
+    daemon_reload: yes

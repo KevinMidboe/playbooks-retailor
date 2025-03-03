@@ -1,0 +1,27 @@
+---
+- name: Check if the current distro is supported (Ubuntu or Debian)
+  set_fact:
+    distro_supported: "{{ ansible_facts['distribution'].lower() in supported_distros }}"
+  tags:
+    - check_distro
+
+- name: Set installation URL based on the distro
+  set_fact:
+    install_url: "https://download.docker.com/linux/{{ ansible_facts['distribution'].lower() }} {{ ansible_distribution_release }} stable"
+  when: distro_supported
+  tags:
+    - set_url
+
+- name: Log Unsupported Distro
+  debug:
+    msg: "The {{ ansible_facts['distribution'] }} distribution is not supported. Skipping Docker installation."
+  when: not distro_supported
+  tags:
+    - unsupported_distro
+
+- name: Skip Docker installation task if distro is unsupported
+  meta: end_play
+  when: not distro_supported
+  tags:
+    - end_play
+

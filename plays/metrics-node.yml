@@ -1,0 +1,17 @@
+---
+- name: Install prometheus exporters
+  hosts: all
+  vars:
+    node_exporter_version: "1.9.0"
+    nginx_exporter_version: "1.4.1"
+    cadvisor_version: "0.46.0"
+    fail2ban_exporter_version: "0.10.2"
+  roles:
+    - role: roles/node_exporter
+    - role: roles/fail2ban_exporter
+    - role: roles/redis_exporter
+      when: install_redis_exporter
+    - role: roles/cadvisor
+      when: install_cadvisor_exporter
+    - role: roles/nginx_prometheus_exporter
+      when: install_nginx_exporter

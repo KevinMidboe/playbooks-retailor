@@ -1,0 +1,12 @@
+---
+- name: Read .env file
+  ansible.builtin.slurp:
+    src: "../.env"
+  delegate_to: localhost
+  register: env_file
+
+- name: Parse .env file
+  ansible.builtin.set_fact:
+    env_vars: "{{ dict(env_file['content'] | b64decode | split('\n') | select('search', '=') | map('split', '=', 1) | list) }}"
+
+

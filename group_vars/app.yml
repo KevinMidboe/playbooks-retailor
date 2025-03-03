@@ -1,0 +1,7 @@
+---
+custom_firewall_ports:
+  - 2049
+  - 1111
+apt_packages:
+  - nfs-server
+description: 'app node for hosting retailor database & persistent assets, serves NFS mount'

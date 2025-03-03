@@ -1,0 +1,32 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+client:
+  url: http://prometheus-grafana:3100/loki/api/v1/push
+scrape_configs:
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          __path__: /var/log/nginx/*.log
+
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<remote_addr>\S+) - - \[(?P<timestamp>[^\]]+)\] "(?P<method>\S+) (?P<path>\S+) (?P<protocol>\S+)" (?P<status>\d+) (?P<bytes>\d+) "(?P<referrer>[^\"]*)" "(?P<user_agent>[^\"]*)"'
+      - timestamp:
+          source: "timestamp"
+          format: "02/Jan/2006:15:04:05 -0700"
+      - labels:
+          remote_addr:
+          method:
+          path:
+          protocol:
+          status:
+          referrer:
+          user_agent:

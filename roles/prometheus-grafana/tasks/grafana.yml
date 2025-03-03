@@ -1,0 +1,56 @@
+---
+- name: Create a Docker network for Grafana
+  docker_network:
+    name: monitoring_network
+    state: present
+
+- name: Create grafana datasources directory on host
+  file:
+    path: /etc/grafana/datasources
+    state: directory
+    mode: "0755"
+
+- name: Create grafana dashboards directory on host
+  file:
+    path: /etc/grafana/dashboards
+    state: directory
+    mode: "0755"
+
+- name: Copy prometheus datasource config
+  template:
+    src: grafana-datasources.yml.j2
+    dest: /etc/grafana/datasources/prometheus.yml
+
+- name: Copy grafana default dashboards config
+  template:
+    src: grafana-dashboards.yml.j2
+    dest: /etc/grafana/dashboards/grafana-dashboards.yml
+
+- name: Copy grafana dashboards
+  copy:
+    src: "{{ item }}"
+    dest: /etc/grafana/dashboards/{{ item | basename | regex_replace('\.j2$', '') }}
+  loop: "{{ query('fileglob', 'templates/grafana-dashboards/*.json') }}"
+
+- name: Pull Grafana Docker image
+  docker_image:
+    name: grafana/grafana-oss:latest
+    source: pull
+
+- name: Start Grafana container
+  docker_container:
+    name: grafana
+    image: grafana/grafana-oss:latest
+    state: started
+    restart: yes
+    restart_policy: unless-stopped
+    published_ports:
+      - "3000:3000"
+    volumes:
+      - /etc/grafana/datasources:/etc/grafana/provisioning/datasources
+      - /etc/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - name: monitoring_network
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: "{{ env_vars.GRAFANA_PASSWORD }}" # Customize the password
+

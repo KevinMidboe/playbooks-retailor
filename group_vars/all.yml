@@ -1,0 +1,12 @@
+---
+install_cadvisor_exporter: false
+install_nginx_exporter: false
+install_redis_exporter: false
+users:
+  - username: forge
+    oh_my_zsh:
+      theme: robbyrussell
+  - username: root
+    oh_my_zsh:
+      theme: robbyrussell
+

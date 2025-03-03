@@ -1,0 +1,23 @@
+---
+- name: Update apt cache if older than 1 hour
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Add ufw
+  apt: pkg=ufw state=latest
+
+- name: Enable access via ssh
+  ufw:
+    rule: allow
+    port: "22"
+
+- name: Enable custom firewall ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+  loop: "{{ custom_firewall_ports | default([]) }}"
+
+- name: Start ufw
+  ufw:
+    state: enabled

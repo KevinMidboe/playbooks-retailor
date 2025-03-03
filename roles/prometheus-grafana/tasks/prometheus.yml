@@ -1,0 +1,36 @@
+---
+- name: Create a Docker network for Prometheus
+  docker_network:
+    name: monitoring_network
+    state: present
+
+- name: Pull Prometheus Docker image
+  docker_image:
+    name: prom/prometheus
+    source: pull
+
+- name: Create Prometheus configuration file directory on host
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: '0755'
+
+- name: Create Prometheus configuration file
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+
+- name: Start Prometheus container
+  docker_container:
+    name: prometheus
+    image: prom/prometheus:{{ prometheus_version }}
+    state: started
+    restart: yes
+    restart_policy: unless-stopped
+    published_ports:
+      - "9090:9090"
+    volumes:
+      - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - name: monitoring_network
+

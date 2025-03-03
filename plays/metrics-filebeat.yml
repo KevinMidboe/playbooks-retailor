@@ -1,0 +1,10 @@
+---
+- name: Install nginx filebeat log exporter
+  hosts: web
+  roles:
+    - role: roles/filebeat-nginx
+
+- name: Install laravel filebeat log exporter
+  hosts: web
+  roles:
+    - role: roles/filebeat-laravel

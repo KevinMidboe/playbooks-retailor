@@ -1,0 +1,9 @@
+---
+- name: Basic setup, brute force protection, firewall and log shipping
+  hosts: all
+  roles:
+    - role: roles/base-packages         # - Basic server setup and configuration
+    - role: roles/fail2ban              # - SSH Brute force protection
+    - role: roles/firewall              # - Firewall, if firewall_enable is true
+    - role: roles/oh-my-zsh
+    - role: roles/motd

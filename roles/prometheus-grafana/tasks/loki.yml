@@ -1,0 +1,36 @@
+---
+- name: Create a Docker network for loki
+  docker_network:
+    name: monitoring_network
+    state: present
+
+- name: Pull loki Docker image
+  docker_image:
+    name: grafana/loki:latest
+    source: pull
+
+- name: Create loki configuration file directory on host
+  file:
+    path: /etc/loki
+    state: directory
+    mode: '0755'
+
+- name: Create loki configuration file
+  template:
+    src: loki.yml.j2
+    dest: /etc/loki/config.yml
+
+- name: Start loki container
+  docker_container:
+    name: loki
+    image: grafana/loki
+    state: started
+    restart: yes
+    command: -config.file=/etc/loki/config.yml
+    restart_policy: unless-stopped
+    published_ports:
+      - "3100:3100"
+    volumes:
+      - /etc/loki/config.yml:/etc/loki/config.yml
+    networks:
+      - name: monitoring_network

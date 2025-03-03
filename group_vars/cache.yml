@@ -1,0 +1,5 @@
+---
+custom_firewall_ports:
+  - 6379
+install_redis_exporter: true
+description: 'cache node for retailor redis cache'

@@ -1,0 +1,39 @@
+input {
+  beats {
+    port => 5044
+  }
+}
+
+filter {
+ grok {
+   match => [ "message" , "%{COMBINEDAPACHELOG}+%{GREEDYDATA:extra_fields}"]
+   overwrite => [ "message" ]
+ }
+ mutate {
+   convert => ["response", "integer"]
+   convert => ["bytes", "integer"]
+   convert => ["responsetime", "float"]
+ }
+ # geoip {
+ #   source => "clientip"
+ #   add_tag => [ "nginx-geoip" ]
+ # }
+ date {
+   match => [ "timestamp" , "dd/MMM/YYYY:HH:mm:ss Z" ]
+   remove_field => [ "timestamp" ]
+ }
+ # useragent {
+ #   source => "agent"
+ # }
+}
+
+output {
+  elasticsearch {
+    index => "weblogs-%{+YYYY.MM}"
+    hosts => "${ELASTIC_HOSTS}"
+    user => "elastic"
+    password => "${ELASTIC_PASSWORD}"
+    document_type => "nginx_logs"
+  }
+}
+

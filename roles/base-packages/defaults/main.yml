@@ -1,0 +1,22 @@
+# Default base role values
+---
+# Flags for adding APT repositories for common software
+apt_skip_user_packages: false
+
+# Default base role values
+base_packages:
+  - git
+  - vim
+  - curl
+  - dnsutils
+  #  - ntp
+  - ssh
+  - fail2ban
+  - openssh-server
+  - openssl
+
+base_packages_user:
+  - htop
+  - tree
+  - ncdu
+  - nload

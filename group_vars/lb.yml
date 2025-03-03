@@ -1,0 +1,6 @@
+---
+custom_firewall_ports:
+  - 80
+  - 443
+install_nginx_exporter: true
+description: "load balancer serving web servers for retailor.io"

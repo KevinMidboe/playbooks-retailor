@@ -1,0 +1,31 @@
+# APT Related tasks for the base role
+---
+# Add repositories
+- name: install apt https support
+  apt: pkg=apt-transport-https state=latest update_cache=yes cache_valid_time=3600
+
+# Add default packages
+- name: install base packages
+  apt: pkg={{ item }}
+  with_items: "{{ base_packages }}"
+
+# Add user defined packages
+- name: install packages for user quality of life
+  apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items: "{{ base_packages_user | default([]) }}"
+  when: not apt_skip_user_packages | default(False)
+
+# Add host specific packages
+- name: install packages
+  apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items: "{{ apt_packages | default([]) }}"
+
+# Dist-upgrade
+# - name: perform dist-upgrade
+#   apt: upgrade=dist

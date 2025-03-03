@@ -1,0 +1,13 @@
+[Unit]
+Description=redis_exporter
+Documentation=https://github.com/oliver006/redis_exporter
+
+[Service]
+ExecStart=/usr/local/bin/redis_exporter
+Restart=always
+LimitNOFILE=4096
+User=forge
+Environment="REDIS_PASSWORD_FILE=/home/forge/.env-redis_exporter"
+
+[Install]
+WantedBy=multi-user.target

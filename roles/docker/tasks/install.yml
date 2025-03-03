@@ -1,0 +1,12 @@
+---
+- name: Add Docker repository
+  apt_repository:
+    repo: deb {{ install_url }}
+    state: present
+  when: distro_supported
+
+- name: Install Docker
+  apt:
+    name: "{{ docker_package }}"
+    state: present
+  when: distro_supported
